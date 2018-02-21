@@ -90,11 +90,15 @@ func registerWithMaster(masterAddr string) (int, []string) {
 	for done := false; !done; {
 		mcli, err := rpc.DialHTTP("tcp", masterAddr)
 		if err == nil {
-			log.Printf("\nError is nil in registerWithMaster")
+			log.Printf("\nError is nil for dialHTTP call")
 			err = mcli.Call("Master.Register", args, &reply)
 			if err == nil && reply.Ready == true {
+				log.Printf("\nNo error for mcli call")
 				done = true
 				break
+			}
+			if err != nil {
+				log.Printf("mcli call error:", err)
 			}
 		}
 		log.Printf("\nAbout to sleep 1e9")

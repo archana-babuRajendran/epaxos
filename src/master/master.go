@@ -46,15 +46,17 @@ func main() {
 	rpc.Register(master)
 	log.Printf("\nAfter calling rpc Register")
 	rpc.HandleHTTP()
-
+	log.Printf("\nAfter calling HandleHTTP")
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", *portnum))
 	if err != nil {
 		log.Fatal("Master listen error:", err)
 	}
-
+	log.Printf("\nBefore calling run")
 	go master.run()
-
+	log.Printf("\nAfter calling run")
+	log.Printf("\nBefore calling SERVE")
 	http.Serve(l, nil)
+	log.Printf("\nAfter calling SERVE")
 }
 
 func (master *Master) run() {
@@ -115,7 +117,7 @@ func (master *Master) run() {
 }
 
 func (master *Master) Register(args *masterproto.RegisterArgs, reply *masterproto.RegisterReply) error {
-
+	log.Printf("\nIn Register method")
 	master.lock.Lock()
 	defer master.lock.Unlock()
 
@@ -148,7 +150,7 @@ func (master *Master) Register(args *masterproto.RegisterArgs, reply *masterprot
 	} else {
 		reply.Ready = false
 	}
-
+	log.Printf("\nEND of Register method")
 	return nil
 }
 
