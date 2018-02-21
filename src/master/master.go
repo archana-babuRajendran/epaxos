@@ -42,8 +42,11 @@ func main() {
 		make([]bool, *numNodes),
 		make([]bool, *numNodes)}
 
+	log.Printf("\nAbout to call rpc Register")
 	rpc.Register(master)
+	log.Printf("\nAfter calling rpc Register")
 	rpc.HandleHTTP()
+
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", *portnum))
 	if err != nil {
 		log.Fatal("Master listen error:", err)

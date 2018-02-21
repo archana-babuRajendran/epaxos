@@ -51,10 +51,10 @@ func main() {
 		go catchKill(interrupt)
 	}
 
-	log.Printf("Server starting on port %d\n", *portnum)
-
+	log.Printf("\nServer starting on port %d\n", *portnum)
+	log.Printf("\nBefore calling registerWithMaster")
 	replicaId, nodeList := registerWithMaster(fmt.Sprintf("%s:%d", *masterAddr, *masterPort))
-
+	log.Printf("\nAfter calling registerWithMaster")
 	if *doEpaxos {
 		log.Println("Starting Egalitarian Paxos replica...")
 		rep := epaxos.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *beacon, *durable)
@@ -90,12 +90,14 @@ func registerWithMaster(masterAddr string) (int, []string) {
 	for done := false; !done; {
 		mcli, err := rpc.DialHTTP("tcp", masterAddr)
 		if err == nil {
+			log.Printf("\nError is nil in registerWithMaster")
 			err = mcli.Call("Master.Register", args, &reply)
 			if err == nil && reply.Ready == true {
 				done = true
 				break
 			}
 		}
+		log.Printf("\nAbout to sleep 1e9")
 		time.Sleep(1e9)
 	}
 
