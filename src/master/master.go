@@ -70,7 +70,7 @@ func (master *Master) run() {
 		time.Sleep(100000000)
 	}
 	time.Sleep(2000000000)
-
+	log.Printf("\nIn run method Addresslist -> %v",master.addrList)
 	// connect to SMR servers
 	for i := 0; i < master.N; i++ {
 		var err error
@@ -126,19 +126,19 @@ func (master *Master) Register(args *masterproto.RegisterArgs, reply *masterprot
 	index := nlen
 
 	addrPort := fmt.Sprintf("%s:%d", args.Addr, args.Port)
-
+	log.Printf("\nNodelist in Register method ---> %v ",nodeList)
 	for i, ap := range master.nodeList {
 		if addrPort == ap {
 			index = i
 			break
 		}
 	}
-
 	if index == nlen {
 		master.nodeList = master.nodeList[0 : nlen+1]
 		master.nodeList[nlen] = addrPort
 		master.addrList = master.addrList[0 : nlen+1]
 		master.addrList[nlen] = args.Addr
+		log.Printf("\nAddresslist in Register method ---> %v ",addrList)
 		master.portList = master.portList[0 : nlen+1]
 		master.portList[nlen] = args.Port
 		nlen++
