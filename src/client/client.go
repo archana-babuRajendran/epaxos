@@ -100,7 +100,7 @@ func main() {
 		fmt.Println("Uniform distribution")
 	} else {
 		fmt.Println("Zipfian distribution:")
-		//fmt.Println(test[0:100])
+		fmt.Println("Test array 0-100 ",test[0:100])
 	}
 
 	for i := 0; i < N; i++ {
@@ -251,7 +251,7 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 			e = true
 			continue
 		}
-		//fmt.Println(reply.Value)
+		fmt.Println("Reply value",reply.Value)
 		if *check {
 			if rsp[reply.CommandId] {
 				fmt.Println("Duplicate reply", reply.CommandId)
