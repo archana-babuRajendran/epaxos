@@ -126,7 +126,7 @@ func (master *Master) Register(args *masterproto.RegisterArgs, reply *masterprot
 	index := nlen
 
 	addrPort := fmt.Sprintf("%s:%d", args.Addr, args.Port)
-	log.Printf("\nNodelist in Register method ---> %v ",nodeList)
+	log.Printf("\nNodelist in Register method ---> %v ",master.nodeList)
 	for i, ap := range master.nodeList {
 		if addrPort == ap {
 			index = i
@@ -138,7 +138,7 @@ func (master *Master) Register(args *masterproto.RegisterArgs, reply *masterprot
 		master.nodeList[nlen] = addrPort
 		master.addrList = master.addrList[0 : nlen+1]
 		master.addrList[nlen] = args.Addr
-		log.Printf("\nAddresslist in Register method ---> %v ",addrList)
+		log.Printf("\nAddresslist in Register method ---> %v ",master.addrList)
 		master.portList = master.portList[0 : nlen+1]
 		master.portList[nlen] = args.Port
 		nlen++
