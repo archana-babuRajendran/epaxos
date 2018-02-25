@@ -75,6 +75,7 @@ func (master *Master) run() {
 	for i := 0; i < master.N; i++ {
 		var err error
 		addr := fmt.Sprintf("%s:%d", master.addrList[i], master.portList[i]+1000)
+		log.Printf("\nTrying to connect to replica with address %s",addr)
 		master.nodes[i], err = rpc.DialHTTP("tcp", addr)
 		if err != nil {
 			log.Fatalf("Error connecting to replica %d\n", i)
