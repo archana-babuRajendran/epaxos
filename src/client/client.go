@@ -95,6 +95,7 @@ func main() {
 			test[karray[i]]++
 		}
 	}
+	log.Printf("\n Per replica count array : %v ", perReplicaCount)
 	if *conflicts >= 0 {
 		fmt.Println("Uniform distribution")
 	} else {
