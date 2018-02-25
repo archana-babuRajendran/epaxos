@@ -2,7 +2,7 @@ package state
 
 import (
 	"sync"
-	//"fmt"
+	"fmt"
 	//"code.google.com/p/leveldb-go/leveldb"
 	//"encoding/binary"
 )
