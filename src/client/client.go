@@ -84,6 +84,7 @@ func main() {
 			} else {
 				karray[i] = int64(43 + i)
 			}
+			log.Printf("\n With Conflicts; Value of karray : %v ", karray)
 			r = rand.Intn(100)
 			if r < *writes {
 				put[i] = true
@@ -92,6 +93,7 @@ func main() {
 			}
 		} else {
 			karray[i] = int64(zipf.Uint64())
+			log.Printf("\n No Conflicts; Value of karray : %v ", karray)
 			test[karray[i]]++
 		}
 	}
@@ -163,6 +165,7 @@ func main() {
 			args.Command.K = state.Key(karray[i])
 			args.Command.V = state.Value(i)
 			//args.Timestamp = time.Now().UnixNano()
+			fmt.Printf("Value of args request %+v\n", args)
 			if !*fast {
 				if *noLeader {
 					leader = rarray[i]
@@ -251,7 +254,7 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 			e = true
 			continue
 		}
-		fmt.Println("Reply value",reply.Value)
+		//fmt.Println("Reply value",reply.Value)
 		if *check {
 			if rsp[reply.CommandId] {
 				fmt.Println("Duplicate reply", reply.CommandId)
