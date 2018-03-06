@@ -14,5 +14,5 @@ func main() {
   mux := http.NewServeMux()
   mux.Handle("/state", rh)
   log.Println("Listening...")
-  http.ListenAndServe(":3000", mux)
+  http.ListenAndServe(":5000", mux)
 }
