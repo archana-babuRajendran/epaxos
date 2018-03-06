@@ -1,0 +1,18 @@
+package main
+
+import (
+  "log"
+  "net/http"
+)
+
+func dummyHandler(w http.ResponseWriter, r *http.Request) {
+  log.Println("Fielding request")
+  w.Write([]byte("Youve reached state"))
+}
+
+func main() {
+  mux := http.NewServeMux()
+  mux.Handle("/state", rh)
+  log.Println("Listening...")
+  http.ListenAndServe(":3000", mux)
+}
