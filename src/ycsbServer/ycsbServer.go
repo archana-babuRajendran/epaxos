@@ -12,7 +12,7 @@ func dummyHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
   mux := http.NewServeMux()
-  mux.Handle("/state/1", rh)
+  mux.HandleFunc("/state/1", dummyHandler)
   log.Println("Listening...")
-  http.ListenAndServe(":5000", mux)
+  log.Fatal(http.ListenAndServe(":5000", mux))
 }
