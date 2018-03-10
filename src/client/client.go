@@ -60,7 +60,7 @@ func main() {
 		log.Fatalf("Error making the GetReplicaList RPC")
 	}
 
-	N = len(rlReply.ReplicaList)
+	N = len(rlReply.ReplicaList) //number of servers or replicas
 	servers := make([]net.Conn, N)
 	readers := make([]*bufio.Reader, N)
 	writers := make([]*bufio.Writer, N)
@@ -69,30 +69,30 @@ func main() {
 	karray := make([]int64, *reqsNb / *rounds + *eps)
 	put := make([]bool, *reqsNb / *rounds + *eps)
 	perReplicaCount := make([]int, N)
-	test := make([]int, *reqsNb / *rounds + *eps)
+	test := make([]int, *reqsNb / *rounds + *eps) //a list of about a hundred elements. Value can be anything - a count of how many times it occurs
 	for i := 0; i < len(rarray); i++ {
-		r := rand.Intn(N)
+		r := rand.Intn(N) //random order of a particular slot
 		rarray[i] = r
 		if i < *reqsNb / *rounds {
-			perReplicaCount[r]++
+			perReplicaCount[r]++ //per replica operation count
 		}
 
 		if *conflicts >= 0 {
 			r = rand.Intn(100)
 			if r < *conflicts {
-				karray[i] = 42
+				karray[i] = 42 //key is 42 if new random r is less than conflicts
 			} else {
-				karray[i] = int64(43 + i)
+				karray[i] = int64(43 + i) //else 43+replica id
 			}
 			r = rand.Intn(100)
 			if r < *writes {
-				put[i] = true
+				put[i] = true //it has been put/written
 			} else {
 				put[i] = false
 			}
 		} else {
 			karray[i] = int64(zipf.Uint64())
-			test[karray[i]]++
+			test[karray[i]]++ //test is assigned a value/count only when not put/written
 		}
 	}
 	log.Printf("\n Per replica count array : %v ", perReplicaCount)
@@ -100,7 +100,7 @@ func main() {
 		fmt.Println("Uniform distribution")
 	} else {
 		fmt.Println("Zipfian distribution:")
-		fmt.Println("Test array 0-100 ",test[0:100])
+		fmt.Println("Test array 0-100 ",test[0:100]) //what was generated above as test[karray[i]]
 	}
 
 	for i := 0; i < N; i++ {
@@ -110,7 +110,7 @@ func main() {
 			log.Printf("Error connecting to replica %d\n", i)
 		}
 		readers[i] = bufio.NewReader(servers[i])
-		writers[i] = bufio.NewWriter(servers[i])
+		writers[i] = bufio.NewWriter(servers[i]) //servers are the ones that both read and write
 	}
 
 	successful = make([]int, N)
@@ -127,7 +127,7 @@ func main() {
 
 	var id int32 = 0
 	done := make(chan bool, N)
-	args := genericsmrproto.Propose{id, state.Command{state.PUT, 0, 0}, 0}
+	args := genericsmrproto.Propose{id, state.Command{state.PUT, 0, 0}, 0} //This is something you might want to modify
 
 	before_total := time.Now()
 
@@ -153,7 +153,7 @@ func main() {
 		before := time.Now()
 
 		for i := 0; i < n+*eps; i++ {
-			dlog.Printf("Sending proposal %d\n", id)
+			dlog.Printf("Sending proposal %d\n", id) //change
 			args.CommandId = id
 			if put[i] {
 				args.Command.Op = state.PUT
@@ -251,7 +251,7 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 			e = true
 			continue
 		}
-		fmt.Println("Reply value",reply.Value)
+		//fmt.Println("Reply value",reply.Value)
 		if *check {
 			if rsp[reply.CommandId] {
 				fmt.Println("Duplicate reply", reply.CommandId)

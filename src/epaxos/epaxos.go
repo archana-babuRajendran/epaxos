@@ -428,28 +428,28 @@ func (r *Replica) run() {
 
 func (r *Replica) executeCommands() {
 	const SLEEP_TIME_NS = 1e6
-	problemInstance := make([]int32, r.N)
-	timeout := make([]uint64, r.N)
+	problemInstance := make([]int32, r.N) //array of size number of replicas
+	timeout := make([]uint64, r.N) //same
 	for q := 0; q < r.N; q++ {
-		problemInstance[q] = -1
+		problemInstance[q] = -1 //not executed
 		timeout[q] = 0
 	}
 
 	for !r.Shutdown {
 		executed := false
-		for q := 0; q < r.N; q++ {
+		for q := 0; q < r.N; q++ { //for every replica
 			inst := int32(0)
-			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
-				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
+			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ { //executed instances
+				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED { //take that instance from the instance space of the replica - if it's not nil and is executed, add it to executed list and continue
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
 					}
 					continue
 				}
-				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
+				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED { //same and if instance is not committed
 					if inst == problemInstance[q] {
-						timeout[q] += SLEEP_TIME_NS
-						if timeout[q] >= COMMIT_GRACE_PERIOD {
+						timeout[q] += SLEEP_TIME_NS //give it time to commit
+						if timeout[q] >= COMMIT_GRACE_PERIOD { //if passed the commit grace period, that instance has to be recovered with information of replica and instance id
 							r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
@@ -462,7 +462,7 @@ func (r *Replica) executeCommands() {
 					}
 					break
 				}
-				if ok := r.exec.executeCommand(int32(q), inst); ok {
+				if ok := r.exec.executeCommand(int32(q), inst); ok { //to execute the committed instances and add it to the executed list
 					executed = true
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
@@ -471,7 +471,7 @@ func (r *Replica) executeCommands() {
 			}
 		}
 		if !executed {
-			time.Sleep(SLEEP_TIME_NS)
+			time.Sleep(SLEEP_TIME_NS) //give it time to execute
 		}
 		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
 	}

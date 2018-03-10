@@ -1,10 +1,10 @@
 package main
 
 import (
-	"epaxos"
+	"epaxos" //look at what methods of epaxos are invoked
 	"flag"
 	"fmt"
-	"gpaxos"
+	"gpaxos" 
 	"log"
 	"masterproto"
 	"mencius"

@@ -2,7 +2,8 @@ package state
 
 import (
 	"sync"
-	"log"
+	//"log"
+	"fmt"
 	//"code.google.com/p/leveldb-go/leveldb"
 	//"encoding/binary"
 )
@@ -75,7 +76,8 @@ func IsRead(command *Command) bool {
 }
 
 func (c *Command) Execute(st *State) Value {
-	log.Printf("Executing (%d, %d)\n", c.K, c.V)
+	//log.Printf("Executing (%d, %d)\n", c.K, c.V)
+	fmt.Println("Latest bid value is %d placed by user %d\n", c.V, c.K)
 
 	//var key, value [8]byte
 

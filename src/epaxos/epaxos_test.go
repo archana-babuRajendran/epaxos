@@ -75,5 +75,19 @@ func TestExec(t *testing.T) {
 	r.exec.executeCommand(0, 5)
 	r.exec.executeCommand(0, 5)
 
+	'''
+	executeCommand in epaxos-exec.go
+	The structure Exec is defined in epaxos-exec.go and it is r *Replica (an arbitrary number of replicas)
+	The strucure Replica is defined in genericsmr.go
+	InstanceSpace of replica is created in initReplica() above
+	The structure Instance is in epaxos.go
+	Its main attribute seems to be Cmds[] which is state.Command which has operation, key and value
+	The MakeInstance function is in this file and the operation is PUT, key is q and value is i
+	Next, take a look at the function executeCommands() in epaxos.go
+	Looked at executeCommands() - it marks off committed and executed commands with sleep in between and recovers if commit takes too long. It calls executeCommand() in epaxos-exec.go
+	executeCommand() just returns true if the command is executed and false if it is NOT committed. 
+	executeCommand() just looks like a sanity check for executed state. So I think executeCommands() in epaxos. go is where we would have to include the bidding system read and write logic after building a dataset
+ 	'''
+
 	fmt.Println("Test ended\n")
 }
