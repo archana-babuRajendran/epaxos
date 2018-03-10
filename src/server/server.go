@@ -11,12 +11,12 @@ import (
 	"net"
 	"net/http"
 	"net/rpc"
-	"os"
 	"os/signal"
 	"paxos"
 	"runtime"
 	"runtime/pprof"
 	"time"
+	"os"
 )
 
 var portnum *int = flag.Int("port", 7070, "Port # to listen on. Defaults to 7070")
@@ -115,4 +115,11 @@ func catchKill(interrupt chan os.Signal) {
 	}
 	fmt.Println("Caught signal")
 	os.Exit(0)
+}
+
+func placeBid(args *masterproto.GetBidPlacingArgs, reply *masterproto.GetServerReply) error {
+	time.Sleep(4 * 1000 * 1000)
+	fmt.Println("Bid value of ", args.BidValue," received by replica ", args.BidReplica)
+	reply.Status=true
+	return nil
 }

@@ -55,6 +55,7 @@ func main() {
 	}
 
 	rlReply := new(masterproto.GetReplicaListReply)
+
 	err = master.Call("Master.GetReplicaList", new(masterproto.GetReplicaListArgs), rlReply)
 	if err != nil {
 		log.Fatalf("Error making the GetReplicaList RPC")
@@ -102,7 +103,30 @@ func main() {
 		fmt.Println("Zipfian distribution:")
 		fmt.Println("Test array 0-100 ",test[0:100]) //what was generated above as test[karray[i]]
 	}
+	//get input bidding
 
+	//var reader = bufio.NewReader(os.Stdin)
+	fmt.Println("Enter bidding value to be placed: ")
+	var bid int
+	var _,inperr=fmt.Scanf("%d",&bid)
+	if inperr!=nil{
+		fmt.Println("Bid value not gotten")
+	}
+	var server, err2 = rpc.DialHTTP("tcp",rlReply.ReplicaList[0])
+	if err2!=nil{
+		fmt.Println("Connection to server failed")
+	}
+	fmt.Println("Successfully connected to corresponding replica ")
+	var reply = new(masterproto.GetServerReply)
+	var bidargs = masterproto.GetBidPlacingArgs{BidValue:bid, BidReplica:0}
+	server.Call("Server.placeBid",bidargs,reply)
+	fmt.Println("Bid value sent")
+	if reply.Status==true{
+		fmt.Println("Bid value placed successfuly: ",bid)
+	}
+	
+	//fmt.Println("rlReply is: ",rlReply)
+	//fmt.Println("rlReply's replica list is ",rlReply.ReplicaList)
 	for i := 0; i < N; i++ {
 		var err error
 		servers[i], err = net.Dial("tcp", rlReply.ReplicaList[i])
@@ -153,7 +177,7 @@ func main() {
 		before := time.Now()
 
 		for i := 0; i < n+*eps; i++ {
-			dlog.Printf("Sending proposal %d\n", id) //change
+			dlog.Printf("Sending proposal %d\n", id) //and make change here too
 			args.CommandId = id
 			if put[i] {
 				args.Command.Op = state.PUT
@@ -162,6 +186,8 @@ func main() {
 			}
 			args.Command.K = state.Key(karray[i])
 			args.Command.V = state.Value(i)
+
+			//fmt.Println(args.Command.K,args.Command.V)
 			//args.Timestamp = time.Now().UnixNano()
 			if !*fast {
 				if *noLeader {

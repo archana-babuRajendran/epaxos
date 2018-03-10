@@ -18,10 +18,19 @@ type GetLeaderReply struct {
 	LeaderId int
 }
 
+type GetServerReply struct{
+	Status bool
+}
+
 type GetReplicaListArgs struct {
 }
 
 type GetReplicaListReply struct {
 	ReplicaList []string
 	Ready       bool
+}
+
+type GetBidPlacingArgs struct{
+	BidValue int
+	BidReplica int
 }
