@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"dlog"
+	//"dlog"
 	"flag"
 	"fmt"
 	"genericsmrproto"
@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"state"
 	"time"
+	"bytes"
 )
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
@@ -63,20 +64,24 @@ func main() {
 
 	N = len(rlReply.ReplicaList) //number of servers or replicas
 	servers := make([]net.Conn, N)
-	readers := make([]*bufio.Reader, N)
-	writers := make([]*bufio.Writer, N)
+	var b bytes.Buffer
+	//reader := bufio.NewReader(&b)
+	//writer := make(bufio.Writer)
+	writer := bufio.NewWriter(&b)
 
 	rarray = make([]int, *reqsNb / *rounds + *eps)
 	karray := make([]int64, *reqsNb / *rounds + *eps)
 	put := make([]bool, *reqsNb / *rounds + *eps)
-	perReplicaCount := make([]int, N)
+	//perReplicaCount := make([]int, N)
 	test := make([]int, *reqsNb / *rounds + *eps) //a list of about a hundred elements. Value can be anything - a count of how many times it occurs
 	for i := 0; i < len(rarray); i++ {
 		r := rand.Intn(N) //random order of a particular slot
 		rarray[i] = r
+		/*
 		if i < *reqsNb / *rounds {
 			perReplicaCount[r]++ //per replica operation count
 		}
+		*/
 
 		if *conflicts >= 0 {
 			r = rand.Intn(100)
@@ -96,7 +101,7 @@ func main() {
 			test[karray[i]]++ //test is assigned a value/count only when not put/written
 		}
 	}
-	log.Printf("\n Per replica count array : %v ", perReplicaCount)
+	//log.Printf("\n Per replica count array : %v ", perReplicaCount)
 	if *conflicts >= 0 {
 		fmt.Println("Uniform distribution")
 	} else {
@@ -106,6 +111,7 @@ func main() {
 	//get input bidding
 
 	//var reader = bufio.NewReader(os.Stdin)
+	/*
 	fmt.Println("Enter bidding value to be placed: ")
 	var bid int
 	var _,inperr=fmt.Scanf("%d",&bid)
@@ -124,20 +130,49 @@ func main() {
 	if reply.Status==true{
 		fmt.Println("Bid value placed successfuly: ",bid)
 	}
+	*/
 	
 	//fmt.Println("rlReply is: ",rlReply)
 	//fmt.Println("rlReply's replica list is ",rlReply.ReplicaList)
-	for i := 0; i < N; i++ {
+
+	fmt.Println("The value of N is: ",N)
+	var bidarray [7][3] int
+	fmt.Println("starting bid for 7 products")
+
+	for i := 0;i<7;i++{
+		for j := 0;j<N;j++{
+			bidarray[i][j]=rand.Intn(N)
+		}
+	}
+	fmt.Println(bidarray)
+	for prod :=0; prod<7; prod++{
+	for rep := 0; rep < N; rep++ {
 		var err error
+		var i=bidarray[prod][rep]
+		var BidValue int
+
+		fmt.Println("Enter bid value to be place for product ",prod," by replica ",i+1)
+
+		_,err=fmt.Scanf("%d",&BidValue)
+
+		if err!=nil{
+			fmt.Println("Error reading bid value")
+		}
+		
 		servers[i], err = net.Dial("tcp", rlReply.ReplicaList[i])
 		if err != nil {
 			log.Printf("Error connecting to replica %d\n", i)
 		}
-		readers[i] = bufio.NewReader(servers[i])
-		writers[i] = bufio.NewWriter(servers[i]) //servers are the ones that both read and write
-	}
+		//readers[i] = bufio.NewReader(servers[i])
+		
+		//reader=bufio.NewReader(servers[i])
+		//writer=bufio.NewWriter(servers[i])
+		
 
-	successful = make([]int, N)
+		//writers[i] = bufio.NewWriter(servers[i]) //servers are the ones that both read and write
+	//}//change made here
+
+	//successful = make([]int, N)
 	leader := 0
 
 	if *noLeader == false {
@@ -149,43 +184,46 @@ func main() {
 		log.Printf("The leader is replica %d\n", leader)
 	}
 
-	var id int32 = 0
-	done := make(chan bool, N)
+	var id int32 = int32(i)
+	//done := make(chan bool, N)
 	args := genericsmrproto.Propose{id, state.Command{state.PUT, 0, 0}, 0} //This is something you might want to modify
 
 	before_total := time.Now()
 
-	for j := 0; j < *rounds; j++ {
+	//for j := 0; j < *rounds; j++ { //ignoring rounds
 
-		n := *reqsNb / *rounds
-
+		//n := *reqsNb / *rounds
+/*
 		if *check {
 			rsp = make([]bool, n)
 			for j := 0; j < n; j++ {
 				rsp[j] = false
 			}
 		}
-
+*/
+/* //Not working because of reader not being a list
 		if *noLeader {
-			for i := 0; i < N; i++ {
-				go waitReplies(readers, i, perReplicaCount[i], done)
-			}
+			//for i := 0; i < N; i++ {
+				//go waitReplies(readers, i, perReplicaCount[i], done)
+			go waitReplies(reader, i, 1, done)
+			//}
 		} else {
-			go waitReplies(readers, leader, n, done)
+			go waitReplies(reader, leader, N, done)
 		}
+*/
 
 		before := time.Now()
 
-		for i := 0; i < n+*eps; i++ {
-			dlog.Printf("Sending proposal %d\n", id) //and make change here too
+		//for i := 0; i < n+*eps; i++ {
+			fmt.Printf("Sending proposal %d\n", id) //and make change here too
 			args.CommandId = id
 			if put[i] {
 				args.Command.Op = state.PUT
 			} else {
 				args.Command.Op = state.GET
 			}
-			args.Command.K = state.Key(karray[i])
-			args.Command.V = state.Value(i)
+			args.Command.K = state.Key(i)
+			args.Command.V = state.Value(BidValue)
 
 			//fmt.Println(args.Command.K,args.Command.V)
 			//args.Timestamp = time.Now().UnixNano()
@@ -193,27 +231,30 @@ func main() {
 				if *noLeader {
 					leader = rarray[i]
 				}
-				writers[leader].WriteByte(genericsmrproto.PROPOSE)
-				args.Marshal(writers[leader])
+				//writers[leader].WriteByte(genericsmrproto.PROPOSE) //some memory leak here
+				//args.Marshal(writers[leader])
 			} else {
 				//send to everyone
-				for rep := 0; rep < N; rep++ {
-					writers[rep].WriteByte(genericsmrproto.PROPOSE)
-					args.Marshal(writers[rep])
-					writers[rep].Flush()
+				//for rep := 0; rep < N; rep++ {
+					writer.WriteByte(genericsmrproto.PROPOSE)
+					args.Marshal(writer)
+					writer.Flush()
 				}
-			}
-			//fmt.Println("Sent", id)
-			id++
+			//}
+			fmt.Println("Sent the bid placed by replica ", id+1)
+			//id++
+			writer.Flush()
+			/*
 			if i%100 == 0 {
 				for i := 0; i < N; i++ {
 					writers[i].Flush()
 				}
 			}
-		}
+		//} //for loop i< n ** eps
 		for i := 0; i < N; i++ {
 			writers[i].Flush()
 		}
+
 
 		err := false
 		if *noLeader {
@@ -224,11 +265,12 @@ func main() {
 		} else {
 			err = <-done
 		}
+		*/
 
 		after := time.Now()
 
 		fmt.Printf("Round took %v\n", after.Sub(before))
-
+		/*
 		if *check {
 			for j := 0; j < n; j++ {
 				if !rsp[j] {
@@ -236,8 +278,9 @@ func main() {
 				}
 			}
 		}
+		*/
 
-		if err {
+		if err != nil {
 			if *noLeader {
 				N = N - 1
 			} else {
@@ -247,23 +290,27 @@ func main() {
 				log.Printf("New leader is replica %d\n", leader)
 			}
 		}
-	}
+	//}
 
 	after_total := time.Now()
 	fmt.Printf("Test took %v\n", after_total.Sub(before_total))
-
+	/*
 	s := 0
 	for _, succ := range successful {
 		s += succ
 	}
 
 	fmt.Printf("Successful: %d\n", s)
+	
 
 	for _, client := range servers {
 		if client != nil {
-			client.Close()
+			//client.Close() //change made
 		}
 	}
+	*/
+	
+	}}//two for loops closed
 	master.Close()
 }
 

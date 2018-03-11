@@ -17,6 +17,7 @@ import (
 	"runtime/pprof"
 	"time"
 	"os"
+	"sync"
 )
 
 var portnum *int = flag.Int("port", 7070, "Port # to listen on. Defaults to 7070")
@@ -33,6 +34,8 @@ var exec = flag.Bool("exec", false, "Execute commands.")
 var dreply = flag.Bool("dreply", false, "Reply to client only after command has been executed.")
 var beacon = flag.Bool("beacon", false, "Send beacons to other replicas to compare their relative speeds.")
 var durable = flag.Bool("durable", false, "Log to a stable store (i.e., a file in the current dir).")
+
+type Server int
 
 func main() {
 	flag.Parse()
@@ -117,7 +120,7 @@ func catchKill(interrupt chan os.Signal) {
 	os.Exit(0)
 }
 
-func placeBid(args *masterproto.GetBidPlacingArgs, reply *masterproto.GetServerReply) error {
+func (server *Server) placeBid (args *masterproto.GetBidPlacingArgs, reply *masterproto.GetServerReply) error {
 	time.Sleep(4 * 1000 * 1000)
 	fmt.Println("Bid value of ", args.BidValue," received by replica ", args.BidReplica)
 	reply.Status=true
