@@ -140,16 +140,25 @@ func main() {
 	fmt.Println("starting bid for 7 products")
 
 	for i := 0;i<7;i++{
+
 		for j := 0;j<N;j++{
 			bidarray[i][j]=rand.Intn(N)
 		}
 	}
 	fmt.Println(bidarray)
+	var prodbid int
+
 	for prod :=0; prod<7; prod++{
+		var BidValue int
+		fmt.Println("\n\n****************************************************************\n\n")
+		fmt.Println("Bidding product ",prod+1)
+		fmt.Println("\n\n****************************************************************\n\n")
 	for rep := 0; rep < N; rep++ {
 		var err error
 		var i=bidarray[prod][rep]
-		var BidValue int
+		
+
+		
 
 		fmt.Println("Enter bid value to be place for product ",prod," by replica ",i+1)
 
@@ -157,6 +166,16 @@ func main() {
 
 		if err!=nil{
 			fmt.Println("Error reading bid value")
+		}
+
+		if(BidValue<prodbid){
+		fmt.Println("Bid value should be greater than previous bid. Place again: ")
+
+		_,err=fmt.Scanf("%d",&BidValue)
+
+		if err!=nil{
+			fmt.Println("Error reading bid value")
+		}
 		}
 		
 		servers[i], err = net.Dial("tcp", rlReply.ReplicaList[i])
@@ -215,7 +234,7 @@ func main() {
 		before := time.Now()
 
 		//for i := 0; i < n+*eps; i++ {
-			fmt.Printf("Sending proposal %d\n", id) //and make change here too
+			fmt.Printf("Sending proposal %d\n", id+1) //and make change here too
 			args.CommandId = id
 			if put[i] {
 				args.Command.Op = state.PUT
@@ -310,7 +329,9 @@ func main() {
 	}
 	*/
 	
-	}}//two for loops closed
+	}
+	prodbid=BidValue
+	}//two for loops closed
 	master.Close()
 }
 
