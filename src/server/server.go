@@ -17,7 +17,7 @@ import (
 	"runtime/pprof"
 	"time"
 	"os"
-	"sync"
+	//"sync"
 )
 
 var portnum *int = flag.Int("port", 7070, "Port # to listen on. Defaults to 7070")

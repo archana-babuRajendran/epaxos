@@ -145,9 +145,11 @@ func main() {
 
 	for i := 0;i<7;i++{
 
-		for j := 0;j<N;j++{
-			bidarray[i][j]=rand.Intn(N)
-		}
+		//for j := 0;j<N;j++{
+			//entry := rand.Perm(N)
+			//if(entry)
+			bidarray[i] = rand.Perm(N)
+		//}
 	}
 	fmt.Println(bidarray)
 	var prodbid int
