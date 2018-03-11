@@ -136,7 +136,11 @@ func main() {
 	//fmt.Println("rlReply's replica list is ",rlReply.ReplicaList)
 
 	fmt.Println("The value of N is: ",N)
-	var bidarray [7][3] int
+	bidarray := make([][] int, 7) //number of products
+	for i:=range bidarray{
+		bidarray[i]=make([]int,N)
+	}
+
 	fmt.Println("starting bid for 7 products")
 
 	for i := 0;i<7;i++{
