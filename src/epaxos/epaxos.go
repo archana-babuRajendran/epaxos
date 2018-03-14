@@ -14,12 +14,13 @@ import (
 	"state"
 	"sync"
 	"time"
+        "fmt"
 )
 
 const MAX_DEPTH_DEP = 10
 const TRUE = uint8(1)
 const FALSE = uint8(0)
-const DS = 5
+const DS = 7
 const ADAPT_TIME_SEC = 10
 
 const MAX_BATCH = 1000
@@ -830,6 +831,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	seq := int32(0)
 	var deps [DS]int32
+        fmt.Println("\nCHECK CHECK !!! %d\n",r.N)
 	for q := 0; q < r.N; q++ {
 		deps[q] = -1
 	}
