@@ -155,7 +155,8 @@ func main() {
 	var prodbid int
 
 	for prod :=0; prod<7; prod++{
-		var BidValue int
+		//var BidValue int
+		BidValue := 0 
 		fmt.Println("\n\n****************************************************************\n\n")
 		fmt.Println("Bidding product ",prod+1)
 		fmt.Println("\n\n****************************************************************\n\n")
@@ -185,8 +186,10 @@ func main() {
 		}
 		
 		servers[i], err = net.Dial("tcp", rlReply.ReplicaList[i])
+		time.Sleep(40)
 		if err != nil {
 			log.Printf("Error connecting to replica %d\n", i)
+			time.Sleep(200)
 		}
 		//readers[i] = bufio.NewReader(servers[i])
 		
